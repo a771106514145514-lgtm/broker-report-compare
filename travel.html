@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4f5f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)">
+<title>附近好吃好買</title>
+<style>
+:root {
+  --bg: #f4f5f8;
+  --bg-soft: #ffffff;
+  --card: #ffffff;
+  --card-hover: #f0f3fa;
+  --line: #e0e3ec;
+  --text: #1a1d26;
+  --text-dim: #5c6478;
+  --text-faint: #8b93a6;
+  --accent: #2563eb;
+  --accent-soft: rgba(37, 99, 235, 0.1);
+  --danger: #dc2626;
+  --warn: #b45309;
+  --ok: #16a34a;
+  --food: #d9532c;
+  --food-soft: rgba(217, 83, 44, 0.12);
+  --shop: #2563eb;
+  --shop-soft: rgba(37, 99, 235, 0.12);
+  --shadow: 0 8px 30px rgba(20, 25, 45, 0.12);
+  --radius: 12px;
+}
+
+/* 深色：跟隨系統，但使用者若明講要淺色就不套用 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1115;
+    --bg-soft: #161922;
+    --card: #1a1e29;
+    --card-hover: #212635;
+    --line: #2a3040;
+    --text: #e8eaf0;
+    --text-dim: #99a0b3;
+    --text-faint: #6b7385;
+    --accent: #6aa6ff;
+    --accent-soft: rgba(106, 166, 255, 0.14);
+    --danger: #ff6b6b;
+    --warn: #f7b955;
+    --ok: #4ade80;
+    --food: #ff9166;
+    --food-soft: rgba(255, 145, 102, 0.16);
+    --shop: #6aa6ff;
+    --shop-soft: rgba(106, 166, 255, 0.16);
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f1115;
+  --bg-soft: #161922;
+  --card: #1a1e29;
+  --card-hover: #212635;
+  --line: #2a3040;
+  --text: #e8eaf0;
+  --text-dim: #99a0b3;
+  --text-faint: #6b7385;
+  --accent: #6aa6ff;
+  --accent-soft: rgba(106, 166, 255, 0.14);
+  --danger: #ff6b6b;
+  --warn: #f7b955;
+  --ok: #4ade80;
+  --food: #ff9166;
+  --food-soft: rgba(255, 145, 102, 0.16);
+  --shop: #6aa6ff;
+  --shop-soft: rgba(106, 166, 255, 0.16);
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+
+body {
+  font-family: "PingFang TC", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0 22px 90px;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+@media (max-width: 620px) {
+  body { padding: 0 13px 70px; }
+}
+
+/* ---------- 頂列 ---------- */
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 18px 0 14px; flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark { font-size: 28px; line-height: 1; }
+.brand h1 { font-size: 18px; font-weight: 650; letter-spacing: 0.02em; }
+.brand p { font-size: 12.5px; color: var(--text-faint); margin-top: 2px; }
+.topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.btn {
+  font: inherit; font-size: 13px; color: var(--text);
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 9px; padding: 8px 14px; cursor: pointer;
+  transition: background .12s, border-color .12s; white-space: nowrap;
+}
+.btn:hover { background: var(--card-hover); border-color: var(--accent); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn:disabled:hover { background: var(--card); border-color: var(--line); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { filter: brightness(1.08); background: var(--accent); }
+.btn-lg { font-size: 15px; padding: 13px 26px; border-radius: 11px; }
+.btn-sm { font-size: 12px; padding: 6px 10px; }
+
+main { max-width: 1180px; margin: 0 auto; }
+
+/* ---------- 開場 ---------- */
+
+.hero {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 46px 24px 34px; text-align: center; margin-top: 10px;
+}
+.hero-icon { font-size: 42px; line-height: 1; }
+.hero-title { font-size: 19px; font-weight: 650; margin-top: 14px; }
+.hero-hint { font-size: 13px; color: var(--text-dim); margin-top: 8px; line-height: 1.7; }
+.hero .btn-lg { margin-top: 22px; }
+
+.place-form {
+  display: flex; gap: 8px; justify-content: center;
+  margin: 22px auto 0; max-width: 420px;
+}
+.place-form input {
+  font: inherit; font-size: 14px; flex: 1; min-width: 0;
+  color: var(--text); background: var(--bg-soft);
+  border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px;
+}
+.place-form input:focus { outline: none; border-color: var(--accent); }
+
+.place-results {
+  max-width: 420px; margin: 12px auto 0; text-align: left;
+  border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+}
+.place-hit {
+  display: block; width: 100%; text-align: left; font: inherit; font-size: 13.5px;
+  color: var(--text); background: var(--bg-soft); border: none;
+  border-bottom: 1px solid var(--line); padding: 10px 13px; cursor: pointer;
+}
+.place-hit:last-child { border-bottom: none; }
+.place-hit:hover { background: var(--card-hover); }
+.place-hit small { display: block; color: var(--text-faint); font-size: 12px; margin-top: 2px; }
+
+/* ---------- 控制列 ---------- */
+
+.here {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 13px 16px; margin-top: 4px;
+}
+.here-where { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 7px; }
+.here-note { font-size: 12px; color: var(--text-faint); margin-top: 3px; }
+.here-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+select.pill, input.pill {
+  font: inherit; font-size: 13px; color: var(--text);
+  background: var(--bg-soft); border: 1px solid var(--line);
+  border-radius: 9px; padding: 7px 10px;
+}
+select.pill:focus, input.pill:focus { outline: none; border-color: var(--accent); }
+
+.filters { display: flex; flex-direction: column; gap: 9px; margin: 14px 0 4px; }
+.chips { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+.chip {
+  font: inherit; font-size: 12.5px; color: var(--text-dim);
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 999px; padding: 6px 13px; cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+}
+.chip:hover { border-color: var(--accent); }
+.chip-on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chip-on.chip-food { background: var(--food); border-color: var(--food); }
+.chip-on.chip-shop { background: var(--shop); border-color: var(--shop); }
+.chip-count { opacity: .65; margin-left: 5px; font-size: 11.5px; }
+
+.toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-dim); cursor: pointer; }
+.toggle input { accent-color: var(--accent); width: 15px; height: 15px; }
+
+/* ---------- 版面 ---------- */
+
+.grid { display: grid; grid-template-columns: 1fr 268px; gap: 20px; align-items: start; margin-top: 14px; }
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+  .aside { order: -1; }
+}
+
+.aside {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 14px; position: sticky; top: 14px;
+}
+.aside h2 { font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 10px; }
+.radar { width: 100%; max-width: 240px; margin: 0 auto; display: block; }
+.radar-legend { display: flex; gap: 14px; justify-content: center; margin-top: 10px; font-size: 12px; color: var(--text-dim); }
+.radar-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.dot-key { width: 9px; height: 9px; border-radius: 50%; }
+.radar-dot { cursor: pointer; transition: r .12s; }
+.radar-dot:hover { r: 6; }
+
+/* ---------- 清單 ---------- */
+
+.status { font-size: 13px; color: var(--text-dim); margin: 2px 0 12px; }
+.status b { color: var(--text); font-weight: 600; }
+
+.list { display: flex; flex-direction: column; gap: 10px; }
+
+.spot {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 13px 15px;
+  display: grid; grid-template-columns: 34px 1fr auto; gap: 4px 12px;
+  transition: border-color .12s, background .12s;
+}
+.spot:hover { border-color: var(--accent); }
+.spot-flash { animation: flash 1.4s ease-out; }
+@keyframes flash {
+  0%   { border-color: var(--accent); background: var(--accent-soft); }
+  100% { border-color: var(--line); background: var(--card); }
+}
+
+.spot-icon {
+  grid-row: 1 / span 2; font-size: 19px; line-height: 34px; text-align: center;
+  width: 34px; height: 34px; border-radius: 9px; background: var(--shop-soft);
+}
+.spot-food .spot-icon { background: var(--food-soft); }
+
+.spot-name { font-size: 15px; font-weight: 620; line-height: 1.35; word-break: break-word; }
+.spot-alt { font-size: 12px; color: var(--text-faint); margin-top: 1px; word-break: break-word; }
+.spot-far { text-align: right; white-space: nowrap; }
+.spot-dist { font-size: 14px; font-weight: 600; }
+.spot-walk { font-size: 11.5px; color: var(--text-faint); margin-top: 2px; }
+
+.spot-meta { grid-column: 2 / span 2; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 5px; }
+@media (max-width: 560px) {
+  .spot { grid-template-columns: 34px 1fr; }
+  .spot-far { grid-column: 2; text-align: left; display: flex; gap: 8px; align-items: baseline; margin-top: 3px; }
+  .spot-walk { margin-top: 0; }
+  .spot-meta { grid-column: 2; }
+}
+
+.tag {
+  font-size: 11.5px; color: var(--text-dim); background: var(--bg-soft);
+  border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px;
+}
+.tag-type { color: var(--text); }
+.tag-open { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, var(--line)); }
+.tag-shut { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, var(--line)); }
+.tag-hours { color: var(--text-faint); }
+
+.spot-addr { grid-column: 2 / span 2; font-size: 12.5px; color: var(--text-dim); margin-top: 6px; line-height: 1.6; }
+@media (max-width: 560px) { .spot-addr { grid-column: 2; } }
+
+.spot-acts { grid-column: 2 / span 2; display: flex; gap: 7px; flex-wrap: wrap; margin-top: 10px; }
+@media (max-width: 560px) { .spot-acts { grid-column: 1 / span 2; } }
+.spot-acts a.btn { text-decoration: none; display: inline-block; }
+
+.more-wrap { text-align: center; margin-top: 16px; }
+
+.empty {
+  background: var(--card); border: 1px dashed var(--line); border-radius: var(--radius);
+  padding: 34px 20px; text-align: center; color: var(--text-dim); font-size: 14px; line-height: 1.8;
+}
+.empty .btn { margin-top: 14px; }
+
+.notice {
+  border-radius: 10px; padding: 11px 14px; font-size: 13px; line-height: 1.7;
+  border: 1px solid var(--line); background: var(--bg-soft); color: var(--text-dim);
+  margin-top: 12px;
+}
+.notice-warn { border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); color: var(--warn); }
+.notice-bad { border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); color: var(--danger); }
+.notice .btn { margin-top: 9px; }
+
+.loading { display: flex; align-items: center; gap: 11px; font-size: 13.5px; color: var(--text-dim); padding: 22px 2px; }
+.spinner {
+  width: 17px; height: 17px; border-radius: 50%; flex: none;
+  border: 2px solid var(--line); border-top-color: var(--accent);
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast {
+  position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+  background: var(--text); color: var(--bg); font-size: 13.5px;
+  padding: 11px 18px; border-radius: 999px; box-shadow: var(--shadow);
+  z-index: 40; max-width: calc(100vw - 32px); text-align: center;
+}
+
+footer {
+  max-width: 1180px; margin: 34px auto 0; padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 12px; color: var(--text-faint); line-height: 1.8;
+}
+footer a { color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">🧭</span>
+    <div>
+      <h1>附近好吃好買</h1>
+      <p>抓一下你的位置，看看周圍有什麼可以吃、有什麼可以逛</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn" id="btn-lucky" hidden>🎲 隨便選一家</button>
+    <button class="btn" id="btn-again" hidden>換個位置</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- 開場：先要位置 -->
+  <section id="start">
+    <div class="hero">
+      <div class="hero-icon">📍</div>
+      <p class="hero-title">先讓它知道你人在哪</p>
+      <p class="hero-hint">
+        位置只留在你的瀏覽器裡，不會傳給我們——這個工具沒有伺服器。<br>
+        找店家時會去 OpenStreetMap 問「這個座標附近有什麼」，僅此而已。
+      </p>
+      <button class="btn btn-primary btn-lg" id="btn-locate">用我目前的位置</button>
+      <form class="place-form" id="place-form">
+        <input id="place-input" type="search" placeholder="或輸入地點，例如「京都車站」" autocomplete="off" spellcheck="false">
+        <button class="btn" type="submit">搜尋</button>
+      </form>
+      <div class="place-results" id="place-results" hidden></div>
+      <div id="start-msg"></div>
+    </div>
+  </section>
+
+  <!-- 結果 -->
+  <section id="app" hidden>
+    <div class="here">
+      <div>
+        <div class="here-where"><span>📍</span><span id="here-name">你的位置</span></div>
+        <div class="here-note" id="here-note"></div>
+      </div>
+      <div class="here-tools">
+        <label class="toggle" for="radius">範圍</label>
+        <select class="pill" id="radius">
+          <option value="300">走路 3 分鐘（300 公尺）</option>
+          <option value="800" selected>走路 10 分鐘（800 公尺）</option>
+          <option value="2000">2 公里</option>
+          <option value="5000">5 公里</option>
+        </select>
+        <button class="btn btn-sm" id="btn-refresh">重新整理</button>
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="chips" id="chips-group"></div>
+      <div class="chips" id="chips-cat"></div>
+      <div class="chips">
+        <input class="pill" id="q" type="search" placeholder="找特定店名或料理…" autocomplete="off" style="flex:1;min-width:180px;max-width:280px">
+        <label class="toggle"><input type="checkbox" id="open-only"> 只看現在營業中</label>
+        <select class="pill" id="sort">
+          <option value="dist">近的排前面</option>
+          <option value="open">營業中的排前面</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="msg"></div>
+
+    <div class="grid">
+      <div>
+        <p class="status" id="status"></p>
+        <div class="list" id="list"></div>
+        <div class="more-wrap"><button class="btn" id="btn-more" hidden>再看更多</button></div>
+      </div>
+      <aside class="aside" id="aside" hidden>
+        <h2>在哪個方向</h2>
+        <svg class="radar" id="radar" viewBox="0 0 200 200" aria-label="附近店家的方位圖"></svg>
+        <div class="radar-legend">
+          <span><i class="dot-key" style="background:var(--food)"></i>吃的</span>
+          <span><i class="dot-key" style="background:var(--shop)"></i>買的</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  地點資料來自 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> 貢獻者（ODbL 授權），
+  透過 Overpass API 查詢、Nominatim 搜尋地名。<br>
+  營業時間與店家資訊由社群維護，可能過時或不齊全，出發前建議再確認一次。
+</footer>
+
+<script>
+/* ==========================================================================
+   附近好吃好買
+
+   一頁式，沒有後端。流程只有三步：
+     1. 跟瀏覽器要座標（或讓使用者搜尋地名換座標）
+     2. 拿座標去 Overpass API 問附近的 amenity／shop
+     3. 算距離與方位、翻成中文、排出來
+
+   OSM 的資料是社群手動維護的，欄位缺得很兇：沒名字的店、沒營業時間的店
+   到處都是。程式的原則是「寧可不標，也不要標錯」——看不懂的營業時間就
+   只顯示原文，不去猜它現在開不開。
+   ========================================================================== */
+
+/* ===== 以下到 pure-end 為止都是純函式，不碰 DOM ===== */
+
+const R_EARTH = 6371000;
+
+function toRad(deg) { return deg * Math.PI / 180; }
+
+function distanceMeters(a, b) {
+  /* haversine。幾公里內的距離，這個精度綽綽有餘。 */
+  const dLat = toRad(b.lat - a.lat);
+  const dLon = toRad(b.lon - a.lon);
+  const s = Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R_EARTH * Math.asin(Math.min(1, Math.sqrt(s)));
+}
+
+function bearingDeg(a, b) {
+  /* 從 a 看向 b 的方位角，正北為 0，順時針。 */
+  const dLon = toRad(b.lon - a.lon);
+  const lat1 = toRad(a.lat), lat2 = toRad(b.lat);
+  const y = Math.sin(dLon) * Math.cos(lat2);
+  const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+const COMPASS = ['北', '東北', '東', '東南', '南', '西南', '西', '西北'];
+
+function compassOf(deg) {
+  return COMPASS[Math.round(((deg % 360) + 360) % 360 / 45) % 8];
+}
+
+function formatDistance(m) {
+  if (m < 950) return Math.round(m / 10) * 10 + ' 公尺';
+  return (m / 1000).toFixed(m < 9500 ? 1 : 0) + ' 公里';
+}
+
+function walkMinutes(m) {
+  /* 一般步行約每分鐘 75 公尺，市區還要等紅綠燈，抓保守一點。
+     太遠就回 0：那種距離不會有人用走的，寫「步行約 67 分」只是雜訊。 */
+  if (m > 3000) return 0;
+  return Math.max(1, Math.round(m / 75));
+}
+
+/* ---------- 分類 ---------- */
+
+const CATS = {
+  meal:    { group: 'food', label: '正餐',     icon: '🍽️' },
+  quick:   { group: 'food', label: '小吃速食', icon: '🍜' },
+  sweet:   { group: 'food', label: '咖啡甜點', icon: '☕' },
+  drink:   { group: 'food', label: '酒吧飲料', icon: '🍺' },
+  conv:    { group: 'shop', label: '超商超市', icon: '🏪' },
+  mall:    { group: 'shop', label: '百貨商場', icon: '🏬' },
+  fashion: { group: 'shop', label: '服飾鞋包', icon: '👗' },
+  gift:    { group: 'shop', label: '伴手禮',   icon: '🎁' },
+  care:    { group: 'shop', label: '藥妝日用', icon: '💊' },
+  market:  { group: 'shop', label: '市場生鮮', icon: '🧺' },
+  book:    { group: 'shop', label: '書店文具', icon: '📚' },
+  tech:    { group: 'shop', label: '3C 電器',  icon: '🎧' },
+  other:   { group: 'shop', label: '其他店家', icon: '🛍️' },
+};
+
+/* OSM 的 amenity／shop 值 → 分類與中文名稱。
+   只列旅人會想去的，汽車修理、殯葬、倉儲那些就不查了。 */
+const AMENITY_KINDS = {
+  restaurant:  ['meal',  '餐廳'],
+  fast_food:   ['quick', '速食小吃'],
+  food_court:  ['quick', '美食街'],
+  cafe:        ['sweet', '咖啡廳'],
+  ice_cream:   ['sweet', '冰品'],
+  bar:         ['drink', '酒吧'],
+  pub:         ['drink', '酒館'],
+  biergarten:  ['drink', '啤酒花園'],
+  marketplace: ['market', '市場'],
+  pharmacy:    ['care',  '藥局'],
+};
+
+const SHOP_KINDS = {
+  convenience:         ['conv', '便利商店'],
+  supermarket:         ['conv', '超市'],
+  kiosk:               ['conv', '小賣店'],
+  mall:                ['mall', '購物中心'],
+  department_store:    ['mall', '百貨公司'],
+  clothes:             ['fashion', '服飾店'],
+  shoes:               ['fashion', '鞋店'],
+  bag:                 ['fashion', '包款'],
+  jewelry:             ['fashion', '珠寶'],
+  watches:             ['fashion', '鐘錶'],
+  boutique:            ['fashion', '精品店'],
+  fashion_accessories: ['fashion', '飾品'],
+  gift:                ['gift', '禮品店'],
+  art:                 ['gift', '藝品店'],
+  craft:               ['gift', '手作材料'],
+  antiques:            ['gift', '古董店'],
+  chemist:             ['care', '藥妝店'],
+  cosmetics:           ['care', '美妝'],
+  perfumery:           ['care', '香水'],
+  variety_store:       ['care', '生活百貨'],
+  houseware:           ['care', '家居用品'],
+  books:               ['book', '書店'],
+  stationery:          ['book', '文具店'],
+  newsagent:           ['book', '書報攤'],
+  toys:                ['book', '玩具店'],
+  music:               ['book', '唱片行'],
+  musical_instrument:  ['book', '樂器行'],
+  video_games:         ['book', '電玩'],
+  electronics:         ['tech', '電器行'],
+  mobile_phone:        ['tech', '手機行'],
+  computer:            ['tech', '電腦'],
+  camera:              ['tech', '相機'],
+  photo:               ['tech', '沖印店'],
+  bakery:              ['sweet', '麵包店'],
+  pastry:              ['sweet', '糕點'],
+  confectionery:       ['sweet', '糖果甜點'],
+  chocolate:           ['sweet', '巧克力'],
+  tea:                 ['sweet', '茶葉'],
+  coffee:              ['sweet', '咖啡豆'],
+  deli:                ['market', '熟食'],
+  greengrocer:         ['market', '蔬果'],
+  butcher:             ['market', '肉舖'],
+  seafood:             ['market', '海鮮'],
+  farm:                ['market', '農產'],
+  alcohol:             ['drink', '酒類專賣'],
+  wine:                ['drink', '葡萄酒'],
+  beverages:           ['drink', '飲料'],
+  sports:              ['other', '運動用品'],
+  outdoor:             ['other', '戶外用品'],
+  florist:             ['other', '花店'],
+  second_hand:         ['other', '二手店'],
+  charity:             ['other', '義賣二手'],
+};
+
+function classify(tags) {
+  const a = tags.amenity && AMENITY_KINDS[tags.amenity];
+  if (a) return { cat: a[0], typeLabel: a[1] };
+  const s = tags.shop && SHOP_KINDS[tags.shop];
+  if (s) return { cat: s[0], typeLabel: s[1] };
+  return null;
+}
+
+/* ---------- 名稱、料理、地址 ---------- */
+
+const CJK_RE = /[㐀-鿿豈-﫿]/;
+
+function pickName(tags) {
+  /* 有中文名就用中文名；沒有就用當地名稱，再退到英文名或品牌。 */
+  const name = tags['name:zh-Hant'] || tags['name:zh'] || tags.name ||
+               tags['name:en'] || tags['brand:zh'] || tags.brand || tags.operator;
+  return name ? String(name).trim().slice(0, 90) : '';
+}
+
+function pickAltName(tags, shown) {
+  /* 顯示的是中文譯名時，把當地招牌上的原文也留著——問路時要用的是那個。 */
+  const cands = [tags.name, tags['name:en'], tags.int_name, tags.brand];
+  for (const c of cands) {
+    const v = c && String(c).trim();
+    if (v && v !== shown && v.length <= 90) return v;
+  }
+  return '';
+}
+
+const CUISINES = {
+  japanese: '日式', ramen: '拉麵', sushi: '壽司', udon: '烏龍麵', soba: '蕎麥麵',
+  yakitori: '串燒', tempura: '天婦羅', donburi: '丼飯', curry: '咖哩',
+  chinese: '中式', taiwanese: '台式', cantonese: '粵式', sichuan: '川菜',
+  dumpling: '水餃', noodle: '麵食', hotpot: '火鍋', dim_sum: '港點',
+  korean: '韓式', thai: '泰式', vietnamese: '越式', indian: '印度',
+  malaysian: '馬來西亞', indonesian: '印尼', asian: '亞洲料理',
+  italian: '義式', pizza: '披薩', pasta: '義大利麵', french: '法式',
+  spanish: '西班牙', greek: '希臘', turkish: '土耳其', german: '德式',
+  mexican: '墨西哥', american: '美式', burger: '漢堡', steak_house: '牛排',
+  bbq: '燒烤', barbecue: '燒烤', chicken: '炸雞', kebab: '沙威瑪',
+  sandwich: '三明治', hot_dog: '熱狗', fish_and_chips: '炸魚薯條',
+  seafood: '海鮮', vegetarian: '素食', vegan: '純素', breakfast: '早餐',
+  brunch: '早午餐', dessert: '甜點', cake: '蛋糕', ice_cream: '冰淇淋',
+  donut: '甜甜圈', crepe: '可麗餅', bubble_tea: '手搖飲', tea: '茶飲',
+  coffee_shop: '咖啡', juice: '果汁', beverages: '飲料', soup: '湯品',
+  local: '在地料理', regional: '在地料理', international: '各國料理',
+  friture: '炸物', pancake: '鬆餅', bagel: '貝果', sausage: '香腸',
+  bakery: '麵包', sandwich_shop: '三明治', fried_food: '炸物',
+};
+
+function cuisineLabel(raw) {
+  if (!raw) return '';
+  return String(raw).split(';').slice(0, 3).map((v) => {
+    const k = v.trim().toLowerCase();
+    if (!k) return '';
+    return CUISINES[k] || k.replace(/_/g, ' ');
+  }).filter(Boolean).join('・');
+}
+
+function buildAddress(tags) {
+  if (tags['addr:full']) return String(tags['addr:full']);
+  const num = tags['addr:housenumber'] || '';
+  const street = tags['addr:street'] || '';
+  const area = [tags['addr:city'], tags['addr:district'], tags['addr:suburb']]
+    .filter(Boolean).join('');
+  if (!street && !area) return '';
+  /* 中文地址是「市區路號」由大到小，西文地址是「號 路, 市」由小到大。 */
+  if (CJK_RE.test(area + street)) return (area + street + num).trim();
+  const line = [num, street].filter(Boolean).join(' ');
+  return [line, area].filter(Boolean).join(', ');
+}
+
+/* ---------- 營業時間 ---------- */
+
+const OH_DAYS = { mo: 0, tu: 1, we: 2, th: 3, fr: 4, sa: 5, su: 6 };
+const DAY_LABEL = ['一', '二', '三', '四', '五', '六', '日'];
+const OH_DAY_RE = '(?:mo|tu|we|th|fr|sa|su)';
+const OH_SPAN_RE = new RegExp(
+  '^(' + OH_DAY_RE + '(?:-' + OH_DAY_RE + ')?' +
+  '(?:\\s*,\\s*' + OH_DAY_RE + '(?:-' + OH_DAY_RE + ')?)*)\\s*(.*)$'
+);
+const OH_TIME_RE = /^\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}(\s*,\s*\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2})*$/;
+
+function expandDays(spec) {
+  const out = new Set();
+  for (const part of spec.split(',')) {
+    const [from, to] = part.trim().split('-');
+    const a = OH_DAYS[from];
+    if (a === undefined) return null;
+    if (to === undefined) { out.add(a); continue; }
+    const b = OH_DAYS[to];
+    if (b === undefined) return null;
+    for (let i = 0; i <= 6; i++) {           /* Fr-Mo 這種跨週末的寫法要繞回來 */
+      const d = (a + i) % 7;
+      out.add(d);
+      if (d === b) break;
+    }
+  }
+  return out;
+}
+
+function parseTimes(spec) {
+  if (!OH_TIME_RE.test(spec)) return null;
+  const out = [];
+  for (const range of spec.split(',')) {
+    const [s, e] = range.split('-').map((t) => {
+      const [h, m] = t.trim().split(':').map(Number);
+      return h * 60 + m;
+    });
+    if (!(s >= 0 && s <= 1440 && e >= 0 && e <= 1440)) return null;
+    out.push([s, e <= s ? e + 1440 : e]);    /* 18:00-02:00 這種跨夜的，結束時間加一天 */
+  }
+  return out;
+}
+
+function parseOpeningHours(spec) {
+  /* 回傳 7 天各自的營業時段（週一起算，分鐘）。
+     opening_hours 的完整語法非常龐大（月份、第幾週、日出日落…），
+     這裡只認最常見的寫法，遇到不認得的就整筆放棄回 null，讓畫面只顯示原文。 */
+  if (!spec || typeof spec !== 'string') return null;
+  const text = spec.trim().toLowerCase();
+  if (!text || text.length > 200) return null;
+  const days = [[], [], [], [], [], [], []];
+  const all = () => [0, 1, 2, 3, 4, 5, 6];
+  let matched = false;
+
+  for (const chunk of text.split(';')) {
+    let rule = chunk.trim().replace(/\s+/g, ' ');
+    if (!rule) continue;
+    if (/^(ph|sh|easter)\b/.test(rule)) continue;      /* 國定假日的例外，忽略 */
+    rule = rule.replace(/\s*\b(ph|sh)\s*(off|closed)?$/, '').trim();
+
+    if (rule === '24/7' || rule === 'open') {
+      for (const d of all()) days[d] = [[0, 1440]];
+      matched = true;
+      continue;
+    }
+
+    let dayList = all();
+    const m = rule.match(OH_SPAN_RE);
+    let timePart = rule;
+    if (m) {
+      const set = expandDays(m[1]);
+      if (!set) return null;
+      dayList = [...set];
+      timePart = m[2].trim();
+    }
+
+    if (timePart === 'off' || timePart === 'closed') {
+      for (const d of dayList) days[d] = [];
+      matched = true;
+      continue;
+    }
+    if (timePart === '24/7' || timePart === '00:00-24:00') {
+      for (const d of dayList) days[d] = [[0, 1440]];
+      matched = true;
+      continue;
+    }
+
+    const ranges = parseTimes(timePart);
+    if (!ranges) return null;
+    /* 照規範，後面的規則會蓋掉前面的；但很多人把「Mo-Fr 11:00-14:00; Mo-Fr 17:00-21:00」
+       當成兩段午晚餐在寫。這裡選擇累加，只有明寫 off 才清空——
+       猜錯方向的話會把休息時間當成有開，累加至少不會漏掉晚餐時段。 */
+    for (const d of dayList) days[d] = days[d].concat(ranges);
+    matched = true;
+  }
+
+  return matched ? days : null;
+}
+
+function openStateAt(sched, date) {
+  /* sched 是 parseOpeningHours 的結果。回傳 { open, todayText }。 */
+  if (!sched) return null;
+  const dow = (date.getDay() + 6) % 7;                /* JS 的週日是 0，改成週一起算 */
+  const mins = date.getHours() * 60 + date.getMinutes();
+  const today = sched[dow];
+  const prev = sched[(dow + 6) % 7];
+
+  let open = today.some(([s, e]) => mins >= s && mins < Math.min(e, 1440));
+  if (!open) open = prev.some(([, e]) => e > 1440 && mins + 1440 < e);   /* 昨天營業到今天凌晨 */
+
+  const fmt = (v) => {
+    const t = v % 1440;
+    return String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0');
+  };
+  let todayText;
+  if (!today.length) todayText = '今天沒開';
+  else if (today.length === 1 && today[0][0] === 0 && today[0][1] === 1440) todayText = '24 小時';
+  else todayText = '週' + DAY_LABEL[dow] + ' ' + today.map(([s, e]) => fmt(s) + '–' + fmt(e)).join('、');
+
+  return { open, todayText };
+}
+
+/* ---------- 對外連結 ---------- */
+
+function safeUrl(raw) {
+  if (!raw) return '';
+  let v = String(raw).trim();
+  /* OSM 的 website 有一半的人只寫網域（example.com）。看起來像網域又沒寫協定的補上 https，
+     已經帶協定的原樣送進 URL 檢查——javascript: 那種就會在下面被擋掉。 */
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(v) && /^[\w-]+(\.[\w-]+)+/.test(v)) v = 'https://' + v;
+  try {
+    const u = new URL(v);
+    return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : '';
+  } catch { return ''; }
+}
+
+function safeTel(raw) {
+  if (!raw) return '';
+  const v = String(raw).split(';')[0].replace(/[^\d+#*,\s()-]/g, '').trim();
+  return v.length >= 5 ? v : '';
+}
+
+function mapUrl(lat, lon) {
+  /* Google 地圖的通用連結：手機上會直接叫出 App，電腦上開網頁。
+     用座標而不是店名，因為同名的店太多，導到隔壁城市就糟了。 */
+  const q = encodeURIComponent(lat.toFixed(6) + ',' + lon.toFixed(6));
+  return 'https://www.google.com/maps/dir/?api=1&destination=' + q + '&travelmode=walking';
+}
+
+/* ---------- Overpass 查詢 ---------- */
+
+const MAX_ELEMENTS = 600;
+
+function overpassQuery(lat, lon, radius) {
+  const amenities = Object.keys(AMENITY_KINDS).join('|');
+  const shops = Object.keys(SHOP_KINDS).join('|');
+  const at = '(around:' + radius + ',' + lat.toFixed(6) + ',' + lon.toFixed(6) + ')';
+  return '[out:json][timeout:30];(' +
+    'nwr["amenity"~"^(' + amenities + ')$"]' + at + ';' +
+    'nwr["shop"~"^(' + shops + ')$"]' + at + ';' +
+    ');out center ' + MAX_ELEMENTS + ';';
+}
+
+function normalizeElements(elements, origin) {
+  /* Overpass 的回應轉成畫面要的樣子。
+     沒名字的（很多店只有 shop=clothes 沒有 name）直接丟掉——
+     報一個「無名店家」給旅人沒有用。 */
+  const out = [];
+  const seen = new Set();
+  for (const el of elements || []) {
+    const tags = el.tags || {};
+    const lat = typeof el.lat === 'number' ? el.lat : (el.center && el.center.lat);
+    const lon = typeof el.lon === 'number' ? el.lon : (el.center && el.center.lon);
+    if (typeof lat !== 'number' || typeof lon !== 'number') continue;
+
+    const name = pickName(tags);
+    if (!name) continue;
+    const kind = classify(tags);
+    if (!kind) continue;
+
+    /* 同一家店常常同時被畫成一個點跟一塊建物範圍，會重複跑出來。 */
+    const key = name + '@' + lat.toFixed(4) + ',' + lon.toFixed(4);
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    const dist = distanceMeters(origin, { lat, lon });
+    /* shop=bakery 又寫 cuisine=bakery 這種重複標記很常見，同樣的字別掛兩次。 */
+    const cuisine = cuisineLabel(tags.cuisine);
+    const marks = [];
+    if (tags['diet:vegetarian'] === 'yes' || tags['diet:vegan'] === 'yes') marks.push('有素食');
+    if (tags.takeaway === 'yes' || tags.takeaway === 'only') marks.push('可外帶');
+    if (tags.wheelchair === 'yes') marks.push('無障礙');
+    if (tags.outdoor_seating === 'yes') marks.push('有戶外座位');
+
+    out.push({
+      id: el.type + '/' + el.id,
+      name,
+      altName: pickAltName(tags, name),
+      lat, lon, dist,
+      bearing: bearingDeg(origin, { lat, lon }),
+      cat: kind.cat,
+      group: CATS[kind.cat].group,
+      typeLabel: kind.typeLabel,
+      cuisine: (cuisine && (kind.typeLabel.includes(cuisine) || cuisine.includes(kind.typeLabel)))
+        ? '' : cuisine,
+      marks,
+      address: buildAddress(tags),
+      hours: tags.opening_hours ? String(tags.opening_hours).slice(0, 200) : '',
+      sched: parseOpeningHours(tags.opening_hours),
+      phone: safeTel(tags.phone || tags['contact:phone']),
+      website: safeUrl(tags.website || tags['contact:website']),
+    });
+  }
+  out.sort((a, b) => a.dist - b.dist);
+  return out;
+}
+
+function matchesQuery(poi, q) {
+  if (!q) return true;
+  const hay = (poi.name + ' ' + poi.altName + ' ' + poi.typeLabel + ' ' +
+               poi.cuisine + ' ' + poi.address).toLowerCase();
+  return hay.includes(q.toLowerCase());
+}
+
+/* ===== pure-end ===== */
+
+/* ==========================================================================
+   以下是畫面
+   ========================================================================== */
+
+const OVERPASS_ENDPOINTS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
+];
+const CACHE_KEY = 'nearby.cache.v1';
+const PREFS_KEY = 'nearby.prefs.v1';
+const PAGE_SIZE = 40;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+const state = {
+  origin: null,        /* { lat, lon } */
+  placeName: '',
+  accuracy: null,
+  radius: 800,
+  pois: [],
+  group: 'all',        /* all | food | shop */
+  cat: 'all',
+  q: '',
+  openOnly: false,
+  sort: 'dist',
+  shown: PAGE_SIZE,
+  fetchedAt: 0,
+  fromCache: false,
+  loading: false,
+};
+
+/* ---------- 小工具 ---------- */
+
+function toast(text) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2600);
+}
+
+function showMsg(target, html, tone) {
+  const box = $(target);
+  if (!html) { box.innerHTML = ''; return; }
+  box.innerHTML = '<div class="notice ' + (tone ? 'notice-' + tone : '') + '">' + html + '</div>';
+}
+
+function loadPrefs() {
+  try {
+    const p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}');
+    if ([300, 800, 2000, 5000].includes(p.radius)) state.radius = p.radius;
+    if (['all', 'food', 'shop'].includes(p.group)) state.group = p.group;
+    if (typeof p.openOnly === 'boolean') state.openOnly = p.openOnly;
+    if (['dist', 'open'].includes(p.sort)) state.sort = p.sort;
+  } catch { /* 存壞了就用預設值 */ }
+}
+
+function savePrefs() {
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify({
+      radius: state.radius, group: state.group, openOnly: state.openOnly, sort: state.sort,
+    }));
+  } catch { /* 無痕模式寫不進去，不影響使用 */ }
+}
+
+function saveCache() {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      origin: state.origin, placeName: state.placeName, radius: state.radius,
+      fetchedAt: state.fetchedAt, pois: state.pois,
+    }));
+  } catch { /* 資料太大或無痕模式，略過 */ }
+}
+
+function readCache() {
+  try {
+    const c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if (!c || !c.origin || !Array.isArray(c.pois) || !c.pois.length) return null;
+    if (Date.now() - c.fetchedAt > 24 * 3600 * 1000) return null;    /* 隔天了就別用 */
+    return c;
+  } catch { return null; }
+}
+
+function agoText(ts) {
+  const min = Math.round((Date.now() - ts) / 60000);
+  if (min < 1) return '剛剛';
+  if (min < 60) return min + ' 分鐘前';
+  return Math.round(min / 60) + ' 小時前';
+}
+
+/* ---------- 取得位置 ---------- */
+
+function locate() {
+  showMsg('start-msg', '');
+  if (!navigator.geolocation) {
+    showMsg('start-msg', '這個瀏覽器不支援定位，用下面的搜尋輸入地點吧。', 'warn');
+    return;
+  }
+  if (!window.isSecureContext) {
+    showMsg('start-msg',
+      '這一頁不是用 https 開的，瀏覽器不會給位置。改用下面的搜尋輸入地點，一樣可以用。', 'warn');
+    return;
+  }
+
+  const btn = $('btn-locate');
+  btn.disabled = true;
+  btn.textContent = '定位中…';
+
+  navigator.geolocation.getCurrentPosition((pos) => {
+    btn.disabled = false;
+    btn.textContent = '用我目前的位置';
+    state.origin = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+    state.accuracy = pos.coords.accuracy;
+    state.placeName = '你的位置';
+    reverseGeocode(state.origin);
+    enterApp();
+    search();
+  }, (err) => {
+    btn.disabled = false;
+    btn.textContent = '用我目前的位置';
+    /* 直接按兩下打開 HTML 檔的話，多數瀏覽器不管權限設成什麼都不給位置，
+       這時候講「去改權限」只會讓人白忙一場。 */
+    const localFile = location.protocol === 'file:'
+      ? '<br>（你是直接打開這個檔案的，這種開法瀏覽器通常就是不給位置。放到網站上用 https 開才會正常。）'
+      : '';
+    const tips = {
+      1: '瀏覽器把定位擋掉了。點網址列旁邊的鎖頭圖示，把「位置」改成允許，再按一次；<br>不想開權限的話，直接用下面的搜尋輸入地點也可以。' + localFile,
+      2: '拿不到位置訊號（室內、地下街常這樣）。走到窗邊再試，或直接搜尋地點。' + localFile,
+      3: '定位等太久了。再按一次，或直接搜尋地點。',
+    };
+    showMsg('start-msg', tips[err.code] || '定位失敗，改用搜尋輸入地點吧。' + localFile, 'warn');
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+}
+
+async function reverseGeocode(origin) {
+  /* 只是為了在畫面上寫出「你在哪一區」，失敗就算了。 */
+  try {
+    const url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=14' +
+      '&accept-language=zh-TW&lat=' + origin.lat.toFixed(5) + '&lon=' + origin.lon.toFixed(5);
+    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!res.ok) return;
+    const data = await res.json();
+    const a = data.address || {};
+    const parts = [a.city || a.town || a.village || a.county, a.suburb || a.city_district || a.neighbourhood];
+    const label = [...new Set(parts.filter(Boolean))].join(' ');
+    if (label && state.origin === origin) {
+      state.placeName = label;
+      $('here-name').textContent = label;
+    }
+  } catch { /* 沒網路或被擋，維持「你的位置」 */ }
+}
+
+async function searchPlace(q) {
+  const box = $('place-results');
+  box.hidden = false;
+  box.innerHTML = '<div class="place-hit">搜尋中…</div>';
+  try {
+    const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6' +
+      '&accept-language=zh-TW&q=' + encodeURIComponent(q);
+    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const hits = await res.json();
+    if (!hits.length) {
+      box.innerHTML = '<div class="place-hit">找不到這個地點，換個說法試試（例如加上城市名）。</div>';
+      return;
+    }
+    box.innerHTML = '';
+    for (const h of hits) {
+      const btn = document.createElement('button');
+      btn.className = 'place-hit';
+      btn.type = 'button';
+      const main = String(h.display_name || '').split(',')[0];
+      btn.innerHTML = '<b>' + esc(main) + '</b><small>' + esc(h.display_name) + '</small>';
+      btn.addEventListener('click', () => {
+        state.origin = { lat: parseFloat(h.lat), lon: parseFloat(h.lon) };
+        state.accuracy = null;
+        state.placeName = main;
+        box.hidden = true;
+        enterApp();
+        search();
+      });
+      box.appendChild(btn);
+    }
+  } catch {
+    box.innerHTML = '<div class="place-hit">連不上地點搜尋服務，檢查一下網路再試。</div>';
+  }
+}
+
+/* ---------- 查附近 ---------- */
+
+async function overpassFetch(query) {
+  /* 公共 Overpass 主機常常忙線，準備了幾台輪流試。 */
+  let lastErr;
+  for (const endpoint of OVERPASS_ENDPOINTS) {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 35000);
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        body: 'data=' + encodeURIComponent(query),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        signal: ctl.signal,
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      return data.elements || [];
+    } catch (e) {
+      lastErr = e;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  throw lastErr || new Error('查詢失敗');
+}
+
+async function search() {
+  if (!state.origin || state.loading) return;
+  state.loading = true;
+  state.fromCache = false;
+  showMsg('msg', '');
+  $('list').innerHTML =
+    '<div class="loading"><div class="spinner"></div><span>正在問問看附近有什麼…</span></div>';
+  $('status').textContent = '';
+  $('aside').hidden = true;
+  $('btn-more').hidden = true;
+
+  try {
+    const elements = await overpassFetch(overpassQuery(state.origin.lat, state.origin.lon, state.radius));
+    state.pois = normalizeElements(elements, state.origin);
+    state.fetchedAt = Date.now();
+    state.shown = PAGE_SIZE;
+    saveCache();
+    render();
+  } catch {
+    /* 連不上的時候可以退回上次存的結果，但只限「還在同一個地方」——
+       人都已經移動到別的城市了還把舊清單端出來，上面每個距離與方向都是錯的。 */
+    const cache = readCache();
+    const sameSpot = cache && cache.origin &&
+      distanceMeters(cache.origin, state.origin) < 300;
+    $('list').innerHTML = '';
+    if (sameSpot && cache.pois.length) {
+      state.pois = cache.pois;
+      state.radius = cache.radius;
+      state.fetchedAt = cache.fetchedAt;
+      state.fromCache = true;
+      $('radius').value = String(state.radius);
+      render();
+      showMsg('msg', '現在連不上店家資料，先給你看 ' + agoText(cache.fetchedAt) +
+        '在同一個地方存下來的那一份。<br><button class="btn btn-sm" id="btn-retry">再試一次</button>', 'warn');
+    } else {
+      state.pois = [];
+      renderChips();
+      $('status').textContent = '';
+      $('aside').hidden = true;
+      showMsg('msg', '連不上店家資料（公共伺服器忙線或網路不通）。' +
+        '<br><button class="btn btn-sm" id="btn-retry">再試一次</button>', 'bad');
+    }
+    const retry = $('btn-retry');
+    if (retry) retry.addEventListener('click', () => { showMsg('msg', ''); search(); });
+  } finally {
+    state.loading = false;
+  }
+}
+
+/* ---------- 篩選與排序 ---------- */
+
+function visiblePois() {
+  const now = new Date();
+  return state.pois.filter((p) => {
+    if (state.group !== 'all' && p.group !== state.group) return false;
+    if (state.cat !== 'all' && p.cat !== state.cat) return false;
+    if (!matchesQuery(p, state.q)) return false;
+    if (state.openOnly) {
+      const st = openStateAt(p.sched, now);
+      if (!st || !st.open) return false;
+    }
+    return true;
+  }).sort((a, b) => {
+    if (state.sort === 'open') {
+      const oa = openStateAt(a.sched, now);
+      const ob = openStateAt(b.sched, now);
+      const ra = oa ? (oa.open ? 0 : 2) : 1;      /* 沒標時間的排中間，別讓它沉到最底 */
+      const rb = ob ? (ob.open ? 0 : 2) : 1;
+      if (ra !== rb) return ra - rb;
+    }
+    return a.dist - b.dist;
+  });
+}
+
+/* ---------- 畫面 ---------- */
+
+function enterApp() {
+  $('start').hidden = true;
+  $('app').hidden = false;
+  $('btn-again').hidden = false;
+  $('btn-lucky').hidden = false;
+  $('here-name').textContent = state.placeName || '你的位置';
+  $('here-note').textContent = state.accuracy
+    ? '定位誤差大約 ±' + Math.round(state.accuracy) + ' 公尺'
+    : '';
+  $('radius').value = String(state.radius);
+}
+
+function renderChips() {
+  const groups = [
+    ['all', '全部', ''],
+    ['food', '🍜 吃的', 'chip-food'],
+    ['shop', '🛍️ 買的', 'chip-shop'],
+  ];
+  const counts = { all: state.pois.length, food: 0, shop: 0 };
+  for (const p of state.pois) counts[p.group]++;
+
+  $('chips-group').innerHTML = groups.map(([key, label, cls]) =>
+    '<button class="chip ' + cls + (state.group === key ? ' chip-on' : '') + '" data-group="' + key + '">' +
+    esc(label) + '<span class="chip-count">' + counts[key] + '</span></button>'
+  ).join('');
+
+  /* 子分類只列這次真的有找到東西的，免得一排空按鈕。 */
+  const catCounts = {};
+  for (const p of state.pois) {
+    if (state.group !== 'all' && p.group !== state.group) continue;
+    catCounts[p.cat] = (catCounts[p.cat] || 0) + 1;
+  }
+  const cats = Object.keys(CATS).filter((c) => catCounts[c]);
+  $('chips-cat').innerHTML = cats.length
+    ? '<button class="chip' + (state.cat === 'all' ? ' chip-on' : '') + '" data-cat="all">不分類型</button>' +
+      cats.map((c) =>
+        '<button class="chip' + (state.cat === c ? ' chip-on' : '') + '" data-cat="' + c + '">' +
+        CATS[c].icon + ' ' + CATS[c].label + '<span class="chip-count">' + catCounts[c] + '</span></button>'
+      ).join('')
+    : '';
+}
+
+function spotHTML(p) {
+  const st = openStateAt(p.sched, new Date());
+  const tags = ['<span class="tag tag-type">' + esc(p.typeLabel) + '</span>'];
+  if (p.cuisine) tags.push('<span class="tag">' + esc(p.cuisine) + '</span>');
+  if (st) {
+    tags.push('<span class="tag ' + (st.open ? 'tag-open">營業中' : 'tag-shut">已打烊') + '</span>');
+    tags.push('<span class="tag tag-hours">' + esc(st.todayText) + '</span>');
+  } else if (p.hours) {
+    tags.push('<span class="tag tag-hours">' + esc(p.hours) + '</span>');
+  } else {
+    tags.push('<span class="tag tag-hours">沒標營業時間</span>');
+  }
+  for (const m of p.marks) tags.push('<span class="tag">' + esc(m) + '</span>');
+
+  const acts = ['<a class="btn btn-sm btn-primary" target="_blank" rel="noopener" href="' +
+    esc(mapUrl(p.lat, p.lon)) + '">帶我去</a>'];
+  if (p.phone) acts.push('<a class="btn btn-sm" href="tel:' + esc(p.phone.replace(/\s/g, '')) + '">打電話</a>');
+  if (p.website) acts.push('<a class="btn btn-sm" target="_blank" rel="noopener" href="' + esc(p.website) + '">網站</a>');
+  if (p.address) acts.push('<button class="btn btn-sm" data-copy="' + esc(p.address) + '">複製地址</button>');
+
+  return '<article class="spot spot-' + p.group + '" id="spot-' + esc(p.id) + '">' +
+    '<div class="spot-icon">' + CATS[p.cat].icon + '</div>' +
+    '<div><div class="spot-name">' + esc(p.name) + '</div>' +
+      (p.altName ? '<div class="spot-alt">' + esc(p.altName) + '</div>' : '') +
+    '</div>' +
+    '<div class="spot-far"><div class="spot-dist">' + compassOf(p.bearing) + ' ' + formatDistance(p.dist) + '</div>' +
+      (walkMinutes(p.dist) ? '<div class="spot-walk">步行約 ' + walkMinutes(p.dist) + ' 分</div>' : '') + '</div>' +
+    '<div class="spot-meta">' + tags.join('') + '</div>' +
+    (p.address ? '<div class="spot-addr">' + esc(p.address) + '</div>' : '') +
+    '<div class="spot-acts">' + acts.join('') + '</div>' +
+    '</article>';
+}
+
+function renderRadar(list) {
+  const svg = $('radar');
+  const ring = (r) => '<circle cx="100" cy="100" r="' + r + '" fill="none" stroke="var(--line)" stroke-width="1"/>';
+  const dots = list.slice(0, 60).map((p) => {
+    const r = Math.min(92, (p.dist / state.radius) * 90);
+    const rad = toRad(p.bearing);
+    const x = 100 + Math.sin(rad) * r;
+    const y = 100 - Math.cos(rad) * r;
+    return '<circle class="radar-dot" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="4" ' +
+      'fill="var(--' + p.group + ')" opacity="0.85" data-id="' + esc(p.id) + '">' +
+      '<title>' + esc(p.name) + '（' + compassOf(p.bearing) + ' ' + formatDistance(p.dist) + '）</title></circle>';
+  }).join('');
+
+  svg.innerHTML = ring(30) + ring(60) + ring(90) +
+    '<line x1="100" y1="6" x2="100" y2="194" stroke="var(--line)" stroke-width="1"/>' +
+    '<line x1="6" y1="100" x2="194" y2="100" stroke="var(--line)" stroke-width="1"/>' +
+    '<text x="100" y="14" text-anchor="middle" font-size="11" fill="var(--text-faint)">北</text>' +
+    dots +
+    '<circle cx="100" cy="100" r="4.5" fill="var(--text)"/>' +
+    '<text x="100" y="196" text-anchor="middle" font-size="10" fill="var(--text-faint)">' +
+      '外圈 ' + formatDistance(state.radius) + '</text>';
+}
+
+function render() {
+  renderChips();
+  const list = visiblePois();
+  const listEl = $('list');
+
+  if (!state.pois.length) {
+    listEl.innerHTML = '<div class="empty">這個範圍內沒抓到有登記名稱的店家。<br>' +
+      'OpenStreetMap 在偏遠地區的資料本來就比較少，把範圍拉大看看。' +
+      '<br><button class="btn" id="btn-wider">擴大到 ' +
+      (state.radius < 5000 ? formatDistance(state.radius === 300 ? 800 : state.radius === 800 ? 2000 : 5000) : '5 公里') +
+      '</button></div>';
+    $('status').textContent = '';
+    $('aside').hidden = true;
+    $('btn-more').hidden = true;
+    const wider = $('btn-wider');
+    if (wider) wider.addEventListener('click', () => {
+      state.radius = state.radius === 300 ? 800 : state.radius === 800 ? 2000 : 5000;
+      $('radius').value = String(state.radius);
+      savePrefs();
+      search();
+    });
+    return;
+  }
+
+  if (!list.length) {
+    listEl.innerHTML = '<div class="empty">目前的篩選條件沒有東西符合。<br>把「只看營業中」關掉，或換個分類試試。</div>';
+  } else {
+    listEl.innerHTML = list.slice(0, state.shown).map(spotHTML).join('');
+  }
+
+  const foods = list.filter((p) => p.group === 'food').length;
+  $('status').innerHTML = '找到 <b>' + list.length + '</b> 個地方：吃的 ' + foods +
+    '、買的 ' + (list.length - foods) + '　·　' + formatDistance(state.radius) + '內' +
+    (state.fromCache ? '　·　' + agoText(state.fetchedAt) + '存下來的資料' : '');
+
+  $('btn-more').hidden = list.length <= state.shown;
+  $('aside').hidden = !list.length;
+  if (list.length) renderRadar(list);
+}
+
+/* ---------- 隨便選一家 ---------- */
+
+function lucky() {
+  const list = visiblePois();
+  if (!list.length) { toast('目前沒有可以挑的店'); return; }
+  /* 從最近的 15 家裡抽，抽到走一小時外的店沒有意義。 */
+  const pool = list.slice(0, Math.min(15, list.length));
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  const idx = list.indexOf(pick);
+  if (idx >= state.shown) { state.shown = idx + 1; render(); }
+  const el = $('spot-' + pick.id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.remove('spot-flash');
+    void el.offsetWidth;                        /* 重新觸發動畫 */
+    el.classList.add('spot-flash');
+  }
+  toast('就這家吧：' + pick.name);
+}
+
+/* ---------- 事件 ---------- */
+
+loadPrefs();
+$('radius').value = String(state.radius);
+$('open-only').checked = state.openOnly;
+$('sort').value = state.sort;
+
+$('btn-locate').addEventListener('click', locate);
+
+$('place-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const q = $('place-input').value.trim();
+  if (q.length >= 2) searchPlace(q);
+});
+
+$('btn-again').addEventListener('click', () => {
+  $('app').hidden = true;
+  $('start').hidden = false;
+  $('btn-again').hidden = true;
+  $('btn-lucky').hidden = true;
+  $('place-results').hidden = true;
+  showMsg('start-msg', '');
+});
+
+$('btn-refresh').addEventListener('click', () => search());
+$('btn-lucky').addEventListener('click', lucky);
+
+$('radius').addEventListener('change', (e) => {
+  state.radius = Number(e.target.value);
+  savePrefs();
+  search();
+});
+
+$('chips-group').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-group]');
+  if (!btn) return;
+  state.group = btn.dataset.group;
+  state.cat = 'all';
+  state.shown = PAGE_SIZE;
+  savePrefs();
+  render();
+});
+
+$('chips-cat').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-cat]');
+  if (!btn) return;
+  state.cat = btn.dataset.cat;
+  state.shown = PAGE_SIZE;
+  render();
+});
+
+let qTimer;
+$('q').addEventListener('input', (e) => {
+  clearTimeout(qTimer);
+  const v = e.target.value;
+  qTimer = setTimeout(() => { state.q = v.trim(); state.shown = PAGE_SIZE; render(); }, 180);
+});
+
+$('open-only').addEventListener('change', (e) => {
+  state.openOnly = e.target.checked;
+  state.shown = PAGE_SIZE;
+  savePrefs();
+  render();
+});
+
+$('sort').addEventListener('change', (e) => {
+  state.sort = e.target.value;
+  savePrefs();
+  render();
+});
+
+$('btn-more').addEventListener('click', () => {
+  state.shown += PAGE_SIZE;
+  render();
+});
+
+$('list').addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-copy]');
+  if (!btn) return;
+  try {
+    await navigator.clipboard.writeText(btn.dataset.copy);
+    toast('地址複製好了');
+  } catch {
+    toast('這個瀏覽器不給複製，長按地址自己選吧');
+  }
+});
+
+$('radar').addEventListener('click', (e) => {
+  const dot = e.target.closest('[data-id]');
+  if (!dot) return;
+  const list = visiblePois();
+  const idx = list.findIndex((p) => p.id === dot.dataset.id);
+  if (idx >= state.shown) { state.shown = idx + 1; render(); }
+  const el = $('spot-' + dot.dataset.id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.remove('spot-flash');
+    void el.offsetWidth;
+    el.classList.add('spot-flash');
+  }
+});
+
+/* 上次查過的結果先擺出來，這樣在飯店 wifi 很爛的時候至少有東西看。 */
+(function restore() {
+  const cache = readCache();
+  if (!cache) return;
+  showMsg('start-msg',
+    '你 ' + agoText(cache.fetchedAt) + '在「' + esc(cache.placeName || '某處') + '」找過 ' +
+    cache.pois.length + ' 個地方。<br><button class="btn btn-sm" id="btn-restore">直接看那一份</button>');
+  $('btn-restore').addEventListener('click', () => {
+    state.origin = cache.origin;
+    state.placeName = cache.placeName;
+    state.radius = cache.radius;
+    state.pois = cache.pois;
+    state.fetchedAt = cache.fetchedAt;
+    state.fromCache = true;
+    state.shown = PAGE_SIZE;
+    enterApp();
+    render();
+  });
+})();
+</script>
+
+</body>
+</html>
